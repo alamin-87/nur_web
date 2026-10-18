@@ -3,15 +3,17 @@ import { connectDB } from "@/lib/db";
 import { DownloadFile } from "@/lib/models";
 import { getCurrentAdminUser, logActivity } from "@/lib/auth";
 import {
+  MAX_DOWNLOAD_BYTES,
   deleteDownloadBuffer,
   isAllowedDownloadFile,
+  isPdfBuffer,
   storeDownloadBuffer,
 } from "@/lib/download-storage";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const MAX_BYTES = 4 * 1024 * 1024;
+const MAX_BYTES = MAX_DOWNLOAD_BYTES;
 
 function serialize(doc: {
   _id: unknown;
@@ -42,7 +44,7 @@ export async function PUT(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getCurrentAdminUser();
+  const admin = await getCurrentAdminUser(req);
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (admin.role === "viewer") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -66,15 +68,18 @@ export async function PUT(
 
     if (file && file.size > 0) {
       if (!isAllowedDownloadFile(file)) {
-        return NextResponse.json({ error: "Only PDF files are allowed" }, { status: 400 });
+        return NextResponse.json({ error: "Only PDF files allowed" }, { status: 400 });
       }
       if (file.size > MAX_BYTES) {
         return NextResponse.json(
-          { error: "File size exceeds 4MB upload limit. Please upload a smaller PDF." },
+          { error: "File exceeds 50MB limit" },
           { status: 400 }
         );
       }
       const buffer = Buffer.from(await file.arrayBuffer());
+      if (!isPdfBuffer(buffer)) {
+        return NextResponse.json({ error: "Only PDF files allowed" }, { status: 400 });
+      }
       const stored = await storeDownloadBuffer({
         filename: file.name,
         mimeType: file.type || "application/pdf",
@@ -113,10 +118,10 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getCurrentAdminUser();
+  const admin = await getCurrentAdminUser(req);
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (admin.role === "viewer") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

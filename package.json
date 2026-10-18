@@ -9,7 +9,8 @@
     "lint": "eslint",
     "seed": "tsx --env-file=.env.local scripts/seed.ts",
     "seed:usecases": "tsx --env-file=.env.local scripts/patch-usecases.ts",
-    "migrate:cloudinary-media": "tsx --env-file=.env.local scripts/migrate-cloudinary-media.ts"
+    "migrate:cloudinary-media": "tsx --env-file=.env.local scripts/migrate-cloudinary-media.ts",
+    "test:seo-downloads": "tsx --env-file=.env.local scripts/test-seo-and-50mb-downloads.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",

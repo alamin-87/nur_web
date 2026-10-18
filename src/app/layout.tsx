@@ -8,7 +8,7 @@ import { Footer } from "@/components/Footer";
 import { SiteProvider } from "@/components/SiteProvider";
 import { JsonLd } from "@/components/JsonLd";
 import { Analytics } from "@/components/Analytics";
-import { getAnalyticsIds, getSiteUrl } from "@/lib/seo";
+import { DEFAULT_SEO_KEYWORDS, getAnalyticsIds, getSiteUrl, HOMEPAGE_OG_BANNER } from "@/lib/seo";
 import { getSettings, getUseCases } from "@/lib/data";
 
 const body = IBM_Plex_Sans({
@@ -25,8 +25,7 @@ const display = Barlow_Condensed({
   display: "swap",
 });
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -35,33 +34,59 @@ export const viewport: Viewport = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const site = await getSettings();
-  const url = getSiteUrl();
+  const [site, url] = await Promise.all([getSettings(), getSiteUrl()]);
   const { searchConsole } = getAnalyticsIds(site);
+  const brand = site.brandName || "NUR SHOP BD";
+  const defaultTitle =
+    site.seo?.defaultTitle || "NUR SHOP BD - Industrial Machinery, PLC Automation & Spare Parts";
+  const defaultDescription =
+    site.seo?.defaultDescription ||
+    "Buy machine spare parts, industrial automation equipment, PLC conversion, servo systems, and technical support services in Bangladesh from NUR SHOP BD.";
+  const ogImage = `${url}/nurshopbd-banner.png`;
 
   return {
     metadataBase: new URL(url),
     title: {
-      default: site.seo?.defaultTitle || site.brandName,
-      template: `%s | ${site.brandName}`,
+      default: defaultTitle,
+      template: `%s | ${brand}`,
     },
-    description: site.seo?.defaultDescription || site.description,
-    keywords: site.seo?.keywords || [],
-    applicationName: site.brandName,
+    description: defaultDescription,
+    keywords: site.seo?.keywords?.length ? site.seo.keywords : DEFAULT_SEO_KEYWORDS,
+    applicationName: brand,
     icons: site.favicon
       ? {
           icon: site.favicon,
           shortcut: site.favicon,
           apple: site.favicon,
         }
+      : site.logoUrl
+      ? {
+          icon: site.logoUrl,
+          shortcut: site.logoUrl,
+          apple: site.logoUrl,
+        }
       : undefined,
     openGraph: {
       type: "website",
       locale: "en_BD",
       url,
-      siteName: site.brandName,
-      title: site.brandName,
-      description: site.description,
+      siteName: brand,
+      title: defaultTitle,
+      description: defaultDescription,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: defaultTitle,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: defaultTitle,
+      description: defaultDescription,
+      images: [ogImage],
     },
     ...(searchConsole ? { verification: { google: searchConsole } } : {}),
   };

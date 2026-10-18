@@ -15,3 +15,5 @@ export * from "./MediaItem";
 export * from "./ActivityLog";
 export * from "./Feature";
 export * from "./DownloadFile";
+export * from "./DownloadUploadSession";
+export * from "./UploadChunk";

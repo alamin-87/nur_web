@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { CatalogShell } from "@/components/CatalogShell";
 import { HeroSlider } from "@/components/HeroSlider";
 import { SpecialFeaturesSection } from "@/components/SpecialFeaturesSection";
@@ -10,10 +11,64 @@ import {
   getProductsTotalCount,
   getServices,
   getFeatures,
+  getSettings,
 } from "@/lib/data";
+import { DEFAULT_SEO_KEYWORDS, getSiteUrl, HOMEPAGE_OG_BANNER } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const [site, url] = await Promise.all([getSettings(), getSiteUrl()]);
+  const title = "NUR SHOP BD - Industrial Machinery, PLC Automation & Spare Parts";
+  const description =
+    "Buy machine spare parts, industrial automation equipment, PLC conversion, servo systems, and technical support services in Bangladesh from NUR SHOP BD.";
+  const ogImage = `${url}/nurshopbd-banner.png`;
+  const brand = site.brandName || "NUR SHOP BD";
+
+  return {
+    title: {
+      absolute: title,
+    },
+    description,
+    keywords: site.seo?.keywords?.length ? site.seo.keywords : DEFAULT_SEO_KEYWORDS,
+    alternates: {
+      canonical: url,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    openGraph: {
+      type: "website",
+      locale: "en_BD",
+      url,
+      siteName: brand,
+      title,
+      description,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function HomePage({
   searchParams,
@@ -27,7 +82,7 @@ export default async function HomePage({
   const [categories, banners, services, features, products, totalProducts] = await Promise.all([
     getCategories("product"),
     getBanners(),
-    getServices({ limit: 6 }),
+    getServices(),
     getFeatures(),
     getProducts({ page: currentPage, limit: pageSize }),
     getProductsTotalCount(),
@@ -57,7 +112,7 @@ export default async function HomePage({
               className="group bg-white border border-line px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-[2px] shadow-xs hover:border-orange hover:shadow-sm transition flex items-center justify-start gap-1.5 min-h-[54px] sm:min-h-[56px] min-w-0"
             >
               <ServiceItemIcon label={`${service.title} ${service.slug}`} />
-              <span className="min-w-0 text-[13.5px] sm:text-[14px] font-bold text-navy leading-none max-sm:line-clamp-2 sm:whitespace-nowrap">
+              <span className="min-w-0 text-[12px] min-[400px]:text-[13px] sm:text-[13px] lg:text-[12px] xl:text-[13.5px] font-bold text-navy leading-tight line-clamp-2">
                 {service.title}
               </span>
             </Link>
