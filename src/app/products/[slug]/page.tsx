@@ -15,9 +15,9 @@ import {
   getRelatedProducts,
   getSettings,
 } from "@/lib/data";
+import { buildProductMetadata, getSiteUrl } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
@@ -25,12 +25,17 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const [product, site, baseUrl] = await Promise.all([
+    getProductBySlug(slug),
+    getSettings(),
+    getSiteUrl(),
+  ]);
   if (!product) return { title: "Product" };
-  return {
-    title: product.name,
-    description: product.shortDescription,
-  };
+  return buildProductMetadata({
+    site,
+    product,
+    baseUrl,
+  });
 }
 
 export default async function ProductDetailPage({
@@ -52,10 +57,11 @@ export default async function ProductDetailPage({
   const categoryName =
     typeof product.category === "object" ? product.category.name : "Category";
 
-  const [categories, related, siteSettings] = await Promise.all([
+  const [categories, related, siteSettings, siteUrl] = await Promise.all([
     getCategories("product"),
     getRelatedProducts(categoryId, product.slug, 15),
     getSettings(),
+    getSiteUrl(),
   ]);
 
   const phone = siteSettings?.phone || "+880 1700-000000";
@@ -89,8 +95,106 @@ export default async function ProductDetailPage({
     ["Price", priceDisplay],
   ];
 
+  const hasPrice =
+    product.price !== undefined &&
+    product.price !== null &&
+    !isNaN(Number(product.price)) &&
+    Number(product.price) > 0;
+
+  const productAbsoluteImage = product.image
+    ? product.image.startsWith("http")
+      ? product.image
+      : `${siteUrl}${product.image.startsWith("/") ? product.image : `/${product.image}`}`
+    : `${siteUrl}/nurshopbd-banner.png`;
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: productAbsoluteImage,
+    description:
+      product.description ||
+      product.shortDescription ||
+      `${product.name} available at ${siteSettings.brandName || "NUR SHOP BD"}`,
+    sku: product.sku || product.slug,
+    brand: {
+      "@type": "Brand",
+      name: product.brand || siteSettings.brandName || "NUR SHOP BD",
+    },
+    offers: {
+      "@type": "Offer",
+      url: `${siteUrl}/products/${product.slug}`,
+      priceCurrency: product.currency || "BDT",
+      price: hasPrice ? String(product.price) : "0",
+      priceValidUntil: "2030-12-31",
+      availability:
+        product.inStock !== false
+          ? "https://schema.org/InStock"
+          : "https://schema.org/PreOrder",
+      itemCondition: "https://schema.org/NewCondition",
+      seller: {
+        "@type": "Organization",
+        name: siteSettings.brandName || "NUR SHOP BD",
+        url: siteUrl,
+      },
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Products",
+        item: `${siteUrl}/products`,
+      },
+      ...(categorySlug
+        ? [
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: categoryName,
+              item: `${siteUrl}/products?category=${categorySlug}`,
+            },
+            {
+              "@type": "ListItem",
+              position: 4,
+              name: product.name,
+              item: `${siteUrl}/products/${product.slug}`,
+            },
+          ]
+        : [
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: product.name,
+              item: `${siteUrl}/products/${product.slug}`,
+            },
+          ]),
+    ],
+  };
+
   return (
     <CatalogShell categories={categories} activeSlug={categorySlug}>
+      {/* Product JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      {/* BreadcrumbList JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
       {/* Breadcrumb Navigation */}
       <nav className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs text-slate-500 mb-2">
         <Link href="/" className="transition hover:text-orange">
