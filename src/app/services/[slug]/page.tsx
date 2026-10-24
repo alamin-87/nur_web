@@ -62,10 +62,10 @@ export default async function ServiceDetailPage({
     description:
       service.description ||
       service.shortDescription ||
-      `${service.title} provided by ${siteSettings.brandName || "NUR SHOP BD"}`,
+      `${service.title} provided by ${siteSettings.brandName || "Nur Engineering Solution"}`,
     provider: {
       "@type": "Organization",
-      name: siteSettings.brandName || "NUR SHOP BD",
+      name: siteSettings.brandName || "Nur Engineering Solution",
       url: siteUrl,
     },
     areaServed: "BD",

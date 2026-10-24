@@ -36,12 +36,12 @@ export const viewport: Viewport = {
 export async function generateMetadata(): Promise<Metadata> {
   const [site, url] = await Promise.all([getSettings(), getSiteUrl()]);
   const { searchConsole } = getAnalyticsIds(site);
-  const brand = site.brandName || "NUR SHOP BD";
+  const brand = site.brandName || "Nur Engineering Solution";
   const defaultTitle =
-    site.seo?.defaultTitle || "NUR SHOP BD - Industrial Machinery, PLC Automation & Spare Parts";
+    site.seo?.defaultTitle || "Nur Engineering Solution - Industrial Machinery, PLC Automation & Spare Parts";
   const defaultDescription =
     site.seo?.defaultDescription ||
-    "Buy machine spare parts, industrial automation equipment, PLC conversion, servo systems, and technical support services in Bangladesh from NUR SHOP BD.";
+    "Buy machine spare parts, industrial automation equipment, PLC conversion, servo systems, and technical support services in Bangladesh from Nur Engineering Solution.";
   const ogImage = `${url}/nurshopbd-banner.png`;
 
   return {
@@ -55,17 +55,17 @@ export async function generateMetadata(): Promise<Metadata> {
     applicationName: brand,
     icons: site.favicon
       ? {
-          icon: site.favicon,
-          shortcut: site.favicon,
-          apple: site.favicon,
-        }
+        icon: site.favicon,
+        shortcut: site.favicon,
+        apple: site.favicon,
+      }
       : site.logoUrl
-      ? {
+        ? {
           icon: site.logoUrl,
           shortcut: site.logoUrl,
           apple: site.logoUrl,
         }
-      : undefined,
+        : undefined,
     openGraph: {
       type: "website",
       locale: "en_BD",

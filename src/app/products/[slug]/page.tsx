@@ -87,7 +87,7 @@ export default async function ProductDetailPage({
     [
       "Availability",
       product.availabilityText ||
-        (product.inStock ? "In stock – confirm lead time" : "Made to order"),
+      (product.inStock ? "In stock – confirm lead time" : "Made to order"),
     ],
     ["Condition", product.condition || extra?.condition || "As quoted"],
     ["Packing", product.packing || extra?.packing || "Carton"],
@@ -115,11 +115,11 @@ export default async function ProductDetailPage({
     description:
       product.description ||
       product.shortDescription ||
-      `${product.name} available at ${siteSettings.brandName || "NUR SHOP BD"}`,
+      `${product.name} available at ${siteSettings.brandName || "Nur Engineering Solution"}`,
     sku: product.sku || product.slug,
     brand: {
       "@type": "Brand",
-      name: product.brand || siteSettings.brandName || "NUR SHOP BD",
+      name: product.brand || siteSettings.brandName || "Nur Engineering Solution",
     },
     offers: {
       "@type": "Offer",
@@ -134,7 +134,7 @@ export default async function ProductDetailPage({
       itemCondition: "https://schema.org/NewCondition",
       seller: {
         "@type": "Organization",
-        name: siteSettings.brandName || "NUR SHOP BD",
+        name: siteSettings.brandName || "Nur Engineering Solution",
         url: siteUrl,
       },
     },
@@ -158,27 +158,27 @@ export default async function ProductDetailPage({
       },
       ...(categorySlug
         ? [
-            {
-              "@type": "ListItem",
-              position: 3,
-              name: categoryName,
-              item: `${siteUrl}/products?category=${categorySlug}`,
-            },
-            {
-              "@type": "ListItem",
-              position: 4,
-              name: product.name,
-              item: `${siteUrl}/products/${product.slug}`,
-            },
-          ]
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: categoryName,
+            item: `${siteUrl}/products?category=${categorySlug}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 4,
+            name: product.name,
+            item: `${siteUrl}/products/${product.slug}`,
+          },
+        ]
         : [
-            {
-              "@type": "ListItem",
-              position: 3,
-              name: product.name,
-              item: `${siteUrl}/products/${product.slug}`,
-            },
-          ]),
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: product.name,
+            item: `${siteUrl}/products/${product.slug}`,
+          },
+        ]),
     ],
   };
 

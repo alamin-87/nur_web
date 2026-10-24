@@ -19,11 +19,11 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [site, url] = await Promise.all([getSettings(), getSiteUrl()]);
-  const title = "NUR SHOP BD - Industrial Machinery, PLC Automation & Spare Parts";
+  const title = "Nur Engineering Solution - Industrial Machinery, PLC Automation & Spare Parts";
   const description =
-    "Buy machine spare parts, industrial automation equipment, PLC conversion, servo systems, and technical support services in Bangladesh from NUR SHOP BD.";
+    "Buy machine spare parts, industrial automation equipment, PLC conversion, servo systems, and technical support services in Bangladesh from Nur Engineering Solution.";
   const ogImage = `${url}/nurshopbd-banner.png`;
-  const brand = site.brandName || "NUR SHOP BD";
+  const brand = site.brandName || "Nur Engineering Solution";
 
   return {
     title: {

@@ -22,7 +22,7 @@ export const DEFAULT_SEO_KEYWORDS = [
   "Die casting machine conversion",
   "Industrial automation Bangladesh",
   "machine spare parts",
-  "NUR SHOP BD",
+  "Nur Engineering Solution",
   "Nur Engineering Solution",
 ];
 
@@ -106,12 +106,12 @@ export function buildPageMetadata({
   const canonical = `${baseUrl}${path === "/" ? "" : path}`;
   const desc = description || site.seo?.defaultDescription || site.description;
   const ogImage = image?.trim() ? toAbsoluteUrl(image, baseUrl) : `${baseUrl}/nurshopbd-banner.png`;
-  const brand = site.brandName || "NUR SHOP BD";
+  const brand = site.brandName || "Nur Engineering Solution";
   const finalKeywords = keywords?.length
     ? keywords
     : site.seo?.keywords?.length
-    ? site.seo.keywords
-    : DEFAULT_SEO_KEYWORDS;
+      ? site.seo.keywords
+      : DEFAULT_SEO_KEYWORDS;
 
   return {
     title,
@@ -161,7 +161,7 @@ export function buildProductMetadata({
   baseUrl?: string;
 }): Metadata {
   const canonical = `${baseUrl}/products/${product.slug}`;
-  const brand = site.brandName || "NUR SHOP BD";
+  const brand = site.brandName || "Nur Engineering Solution";
   const title = `${product.name} | ${brand}`;
 
   const rawDesc =
@@ -230,7 +230,7 @@ export function buildServiceMetadata({
   baseUrl?: string;
 }): Metadata {
   const canonical = `${baseUrl}/services/${service.slug}`;
-  const brand = site.brandName || "NUR SHOP BD";
+  const brand = site.brandName || "Nur Engineering Solution";
   const title = `${service.title} | ${brand}`;
   const rawDesc =
     service.shortDescription ||
